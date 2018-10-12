@@ -14,10 +14,10 @@
     }
   ],
   "require": {
-    "illuminate/support": "5.*",
-    "illuminate/session": "5.*",
-    "illuminate/events": "5.*",
-    "hashids/hashids": "^3.0"
+    "php": "^7.1.3",
+    "illuminate/support": "5.7.*",
+    "illuminate/session": "5.7.*",
+    "illuminate/events": "5.7.*"
   },
   "require-dev": {
     "phpunit/phpunit": "~7.0",
