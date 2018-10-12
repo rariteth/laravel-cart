@@ -1,10 +1,10 @@
 <?php
 
-namespace Gloudemans\Tests\Shoppingcart\Fixtures;
+namespace Rariteth\LaravelCart\Tests\Fixtures;
 
-use Gloudemans\Shoppingcart\Contracts\Buyable;
+use Rariteth\LaravelCart\Contracts\BuyableInterface;
 
-class BuyableProduct implements Buyable
+class BuyableProduct implements BuyableInterface
 {
     /**
      * @var int|string
@@ -50,7 +50,7 @@ class BuyableProduct implements Buyable
      *
      * @return string
      */
-    public function getBuyableDescription($options = null)
+    public function getBuyableName($options = null)
     {
         return $this->name;
     }

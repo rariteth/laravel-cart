@@ -1,37 +1,29 @@
 <?php
 
 return [
-
+    
+    'store_in_database' => true,
+    'auth_guard'        => 'web',
+    'allow_zero_price'  => false,
+    
     /*
     |--------------------------------------------------------------------------
-    | Default tax rate
+    | Cart database settings
     |--------------------------------------------------------------------------
     |
-    | This default tax rate will be used when you make a class implement the
-    | Taxable interface and use the HasTax trait.
-    |
-    */
-
-    'tax' => 21,
-
-    /*
-    |--------------------------------------------------------------------------
-    | Shoppingcart database settings
-    |--------------------------------------------------------------------------
-    |
-    | Here you can set the connection that the shoppingcart should use when
+    | Here you can set the connection that the cart should use when
     | storing and restoring a cart.
     |
     */
-
+    
     'database' => [
-
+        
         'connection' => null,
-
-        'table' => 'shoppingcart',
-
+        
+        'table' => 'cart',
+    
     ],
-
+    
     /*
     |--------------------------------------------------------------------------
     | Destroy the cart on user logout
@@ -41,9 +33,9 @@ return [
     | destroy all cart instances when the user logs out.
     |
     */
-
+    
     'destroy_on_logout' => false,
-
+    
     /*
     |--------------------------------------------------------------------------
     | Default number format
@@ -53,15 +45,15 @@ return [
     | set them in the method call.
     |
     */
-
+    
     'format' => [
-
+        
         'decimals' => 2,
-
+        
         'decimal_point' => '.',
-
-        'thousand_seperator' => ','
-
+        
+        'thousand_separator' => ','
+    
     ],
 
 ];

@@ -1,6 +1,6 @@
 <?php
 
-namespace Gloudemans\Shoppingcart\Exceptions;
+namespace Rariteth\LaravelCart\Exceptions;
 
 use RuntimeException;
 

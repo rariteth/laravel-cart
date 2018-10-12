@@ -1,20 +1,20 @@
 <?php
 
-namespace Gloudemans\Tests\Shoppingcart;
+namespace Rariteth\LaravelCart\Tests;
 
 use Mockery;
 use PHPUnit\Framework\Assert;
-use Gloudemans\Shoppingcart\Cart;
+use Rariteth\LaravelCart\Cart;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Support\Collection;
-use Gloudemans\Shoppingcart\CartItem;
+use Rariteth\LaravelCart\CartItem;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Session\SessionManager;
 use Illuminate\Contracts\Auth\Authenticatable;
-use Gloudemans\Shoppingcart\ShoppingcartServiceProvider;
-use Gloudemans\Tests\Shoppingcart\Fixtures\ProductModel;
-use Gloudemans\Tests\Shoppingcart\Fixtures\BuyableProduct;
+use Rariteth\LaravelCart\CartServiceProvider;
+use Rariteth\LaravelCart\Tests\Fixtures\ProductModel;
+use Rariteth\LaravelCart\Tests\Fixtures\BuyableProduct;
 
 class CartTest extends TestCase
 {
@@ -28,7 +28,7 @@ class CartTest extends TestCase
      */
     protected function getPackageProviders($app)
     {
-        return [ShoppingcartServiceProvider::class];
+        return [CartServiceProvider::class];
     }
 
     /**
@@ -70,7 +70,7 @@ class CartTest extends TestCase
     {
         $cart = $this->getCart();
 
-        $this->assertEquals(Cart::DEFAULT_INSTANCE, $cart->currentInstance());
+        $this->assertEquals(Cart::DEFAULT_INSTANCE, $cart->getInstance());
     }
 
     /** @test */
@@ -340,7 +340,7 @@ class CartTest extends TestCase
 
     /**
      * @test
-     * @expectedException \Gloudemans\Shoppingcart\Exceptions\InvalidRowIDException
+     * @expectedException InvalidRowIDException
      */
     public function it_will_throw_an_exception_if_a_rowid_was_not_found()
     {
@@ -620,7 +620,7 @@ class CartTest extends TestCase
 
     /**
      * @test
-     * @expectedException \Gloudemans\Shoppingcart\Exceptions\UnknownModelException
+     * @expectedException UnknownModelException
      * @expectedExceptionMessage The supplied model SomeModel does not exist.
      */
     public function it_will_throw_an_exception_when_a_non_existing_model_is_being_associated()
@@ -783,10 +783,10 @@ class CartTest extends TestCase
 
         $cartItem = $cart->get('027c91341fd5cf4d2579b49c4b6a90da');
 
-        $this->assertEquals('2000,00', $cartItem->price());
+        $this->assertEquals('2000,00', $cartItem->getPrice());
         $this->assertEquals('2420,00', $cartItem->priceTax());
         $this->assertEquals('4000,00', $cartItem->subtotal());
-        $this->assertEquals('4840,00', $cartItem->total());
+        $this->assertEquals('4840,00', $cartItem->getTotal());
         $this->assertEquals('420,00', $cartItem->tax());
         $this->assertEquals('840,00', $cartItem->taxTotal());
     }
@@ -815,7 +815,7 @@ class CartTest extends TestCase
 
     /**
      * @test
-     * @expectedException \Gloudemans\Shoppingcart\Exceptions\CartAlreadyStoredException
+     * @expectedException CartAlreadyStoredException
      * @expectedExceptionMessage A cart with identifier 123 was already stored.
      */
     public function it_will_throw_an_exception_when_a_cart_was_already_stored_using_the_specified_identifier()
@@ -890,10 +890,10 @@ class CartTest extends TestCase
 
         $cart->setTax('027c91341fd5cf4d2579b49c4b6a90da', 19);
 
-        $this->assertEquals(10.00, $cartItem->price(2));
+        $this->assertEquals(10.00, $cartItem->getPrice(2));
         $this->assertEquals(11.90, $cartItem->priceTax(2));
         $this->assertEquals(20.00, $cartItem->subtotal(2));
-        $this->assertEquals(23.80, $cartItem->total(2));
+        $this->assertEquals(23.80, $cartItem->getTotal(2));
         $this->assertEquals(1.90, $cartItem->tax(2));
         $this->assertEquals(3.80, $cartItem->taxTotal(2));
 
@@ -919,7 +919,7 @@ class CartTest extends TestCase
     /**
      * Get an instance of the cart.
      *
-     * @return \Gloudemans\Shoppingcart\Cart
+     * @return Cart
      */
     private function getCart()
     {
@@ -940,6 +940,6 @@ class CartTest extends TestCase
     {
         $this->app['config']->set('cart.format.decimals', $decimals);
         $this->app['config']->set('cart.format.decimal_point', $decimalPoint);
-        $this->app['config']->set('cart.format.thousand_seperator', $thousandSeperator);
+        $this->app['config']->set('cart.format.thousand_separator', $thousandSeperator);
     }
 }

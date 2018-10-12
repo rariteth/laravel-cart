@@ -1,10 +1,10 @@
 <?php
 
-namespace Gloudemans\Tests\Shoppingcart;
+namespace Rariteth\LaravelCart\Tests;
 
 use Orchestra\Testbench\TestCase;
-use Gloudemans\Shoppingcart\CartItem;
-use Gloudemans\Shoppingcart\ShoppingcartServiceProvider;
+use Rariteth\LaravelCart\CartItem;
+use Rariteth\LaravelCart\CartServiceProvider;
 
 class CartItemTest extends TestCase
 {
@@ -16,14 +16,14 @@ class CartItemTest extends TestCase
      */
     protected function getPackageProviders($app)
     {
-        return [ShoppingcartServiceProvider::class];
+        return [CartServiceProvider::class];
     }
 
     /** @test */
     public function it_can_be_cast_to_an_array()
     {
         $cartItem = new CartItem(1, 'Some item', 10.00, ['size' => 'XL', 'color' => 'red']);
-        $cartItem->setQuantity(2);
+        $cartItem->setQty(2);
 
         $this->assertEquals([
             'id' => 1,
@@ -44,7 +44,7 @@ class CartItemTest extends TestCase
     public function it_can_be_cast_to_json()
     {
         $cartItem = new CartItem(1, 'Some item', 10.00, ['size' => 'XL', 'color' => 'red']);
-        $cartItem->setQuantity(2);
+        $cartItem->setQty(2);
 
         $this->assertJson($cartItem->toJson());
 
