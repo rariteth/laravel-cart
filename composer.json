@@ -42,7 +42,7 @@
   "extra": {
     "laravel": {
       "providers": [
-        "Rariteth\\LaravelCart\\LaravelCartServiceProvider"
+        "Rariteth\\LaravelCart\\CartServiceProvider"
       ]
     }
   }
