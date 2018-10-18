@@ -1,6 +1,6 @@
 <?php
 
-namespace Rariteth\LaravelCart;
+namespace Rariteth\LaravelCart\Entities;
 
 use Illuminate\Support\Collection;
 

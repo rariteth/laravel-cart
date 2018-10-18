@@ -6,7 +6,7 @@ namespace Rariteth\LaravelCart\Events;
 
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Foundation\Events\Dispatchable;
-use Rariteth\LaravelCart\CartItem;
+use Rariteth\LaravelCart\Entities\CartItem;
 use Rariteth\LaravelCart\Contracts\CartInstanceInterface;
 
 class CartAddedItemEvent

@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Rariteth\LaravelCart;
+namespace Rariteth\LaravelCart\Entities;
 
+use Assert\Assertion;
+use Assert\AssertionFailedException;
 use Rariteth\LaravelCart\Contracts\CartInstanceInterface;
 
 class CartInstance implements CartInstanceInterface
@@ -26,13 +28,18 @@ class CartInstance implements CartInstanceInterface
     /**
      * Cart constructor
      *
-     * @param string      $instance
-     * @param string|null $guard
+     * @param string $instance
+     * @param string $guard
+     *
+     * @throws AssertionFailedException
      */
-    public function __construct(string $instance = self::DEFAULT_INSTANCE, string $guard = null)
+    public function __construct(string $instance = self::DEFAULT_INSTANCE, string $guard = self::DEFAULT_GUARD)
     {
+        Assertion::notBlank($instance);
+        Assertion::notBlank($guard);
+        
         $this->instance = $instance;
-        $this->guard    = $guard ?: config('cart.auth_guard', self::DEFAULT_GUARD);
+        $this->guard    = $guard;
     }
     
     /**

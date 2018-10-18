@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Rariteth\LaravelCart\Contracts\Repositories;
 
 use Closure;
-use Rariteth\LaravelCart\CartItem;
+use Rariteth\LaravelCart\Entities\CartInstance;
+use Rariteth\LaravelCart\Entities\CartItem;
 use Rariteth\LaravelCart\Contracts\CartInstanceInterface;
-use Rariteth\LaravelCart\Contracts\CartInterface;
 use Illuminate\Support\Collection;
 use Rariteth\LaravelCart\Contracts\BuyableInterface;
 
@@ -22,11 +22,6 @@ interface CartRepositoryInterface
      * @return Collection
      */
     public function getItems(): Collection;
-    
-    /**
-     * @return Collection
-     */
-    public function getExpiredItems(): Collection;
     
     /**
      * @return Collection
@@ -58,7 +53,7 @@ interface CartRepositoryInterface
     /**
      * @inheritdoc
      */
-    public function hasItem(CartInterface $cart, CartItem $cartItem): bool;
+    public function hasItem(CartInstanceInterface $cart, CartItem $cartItem): bool;
     
     /**
      * Clear the cart
@@ -77,7 +72,7 @@ interface CartRepositoryInterface
      *
      * @return CartItem
      */
-    public function add(BuyableInterface $buyable, int $qty, array $options = []): CartItem;
+    public function add(BuyableInterface $buyable, int $qty = 1, array $options = []): CartItem;
     
     /**
      * @param CartItem $cartItem
@@ -120,4 +115,12 @@ interface CartRepositoryInterface
      * @return Collection
      */
     public function search(Closure $search): Collection;
+    
+    
+    /**
+     * Refresh cart items from buyable model
+     *
+     * @param Collection $items
+     */
+    public function refresh(Collection $items): void;
 }

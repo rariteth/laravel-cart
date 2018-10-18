@@ -2,8 +2,7 @@
 
 namespace Rariteth\LaravelCart\Contracts;
 
-use Illuminate\Support\Carbon;
-use Rariteth\LaravelCart\CartItemOptions;
+use Rariteth\LaravelCart\Entities\CartItemOptions;
 
 /**
  * BuyableInterface
@@ -36,13 +35,4 @@ interface BuyableInterface
      * @return float
      */
     public function getBuyablePrice(CartItemOptions $options): float;
-    
-    /**
-     * Get the price of the Buyable item.
-     *
-     * @param CartItemOptions $options
-     *
-     * @return Carbon
-     */
-    public function getBuyableExpireAt(CartItemOptions $options): Carbon;
 }

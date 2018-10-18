@@ -5,13 +5,12 @@ return [
     'store_in_database' => true,
     'auth_guard'        => 'web',
     'allow_zero_price'  => false,
-    
     /*
     |--------------------------------------------------------------------------
-    | Cart database settings
+    | Shoppingcart database settings
     |--------------------------------------------------------------------------
     |
-    | Here you can set the connection that the cart should use when
+    | Here you can set the connection that the shoppingcart should use when
     | storing and restoring a cart.
     |
     */
@@ -20,7 +19,7 @@ return [
         
         'connection' => null,
         
-        'table' => 'cart',
+        'table' => 'shoppingcart',
     
     ],
     
@@ -48,12 +47,11 @@ return [
     
     'format' => [
         
-        'decimals' => 2,
+        'decimals' => 0,
         
         'decimal_point' => '.',
         
-        'thousand_separator' => ','
-    
+        'thousand_separator' => ' ',
     ],
 
 ];

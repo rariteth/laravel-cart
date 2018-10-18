@@ -7,15 +7,15 @@ namespace Rariteth\LaravelCart\Repositories;
 use Closure;
 use Illuminate\Database\Connection;
 use InvalidArgumentException;
-use Rariteth\LaravelCart\CartItemOptions;
+use Rariteth\LaravelCart\Entities\CartItemOptions;
 use Rariteth\LaravelCart\Contracts\CartInstanceInterface;
-use Rariteth\LaravelCart\Contracts\CartInterface;
 use Rariteth\LaravelCart\Contracts\Repositories\CartRepositoryInterface;
-use Rariteth\LaravelCart\CartItem;
+use Rariteth\LaravelCart\Entities\CartItem;
 use Rariteth\LaravelCart\Contracts\BuyableInterface;
 use Illuminate\Support\Collection;
 use Rariteth\LaravelCart\Events\CartAddedItemEvent;
 use Rariteth\LaravelCart\Events\CartClearedEvent;
+use Rariteth\LaravelCart\Events\CartRefreshedEvent;
 use Rariteth\LaravelCart\Events\CartRemovedItemEvent;
 use Rariteth\LaravelCart\Events\CartUpdatedItemEvent;
 
@@ -82,6 +82,21 @@ class CartRepository implements CartRepositoryInterface
         return $this->getItems()->filter($search);
     }
     
+    public function refresh(Collection $items): void
+    {
+        $refreshItems = $items->map(function (CartItem $cartItem) {
+            $cartItem->setAuthorized($this->isAuthorized());
+            
+            return $cartItem->update($cartItem->buyable);
+        });
+        
+        $this->items = $this->getItems()->merge($refreshItems);
+        
+        $this->storeItems();
+        
+        event(new CartRefreshedEvent($this->cartInstance));
+    }
+    
     /**
      * @inheritdoc
      */
@@ -127,7 +142,6 @@ class CartRepository implements CartRepositoryInterface
         }
     }
     
-    
     /**
      * @inheritdoc
      */
@@ -138,16 +152,6 @@ class CartRepository implements CartRepositoryInterface
         }
         
         return $this->items;
-    }
-    
-    /**
-     * @return Collection
-     */
-    public function getExpiredItems(): Collection
-    {
-        return $this->getItems()->filter(function (CartItem $cartItem) {
-            return $cartItem->expireAt < now();
-        });
     }
     
     /**
@@ -223,7 +227,7 @@ class CartRepository implements CartRepositoryInterface
     /**
      * @inheritdoc
      */
-    public function hasItem(CartInterface $cart, CartItem $cartItem): bool
+    public function hasItem(CartInstanceInterface $cart, CartItem $cartItem): bool
     {
         return $this->getItems()->pluck('rowId')->contains($cartItem->rowId);
     }
@@ -384,10 +388,17 @@ class CartRepository implements CartRepositoryInterface
      */
     private function getIdentifier(): ?int
     {
-//        return auth($this->cartInstance->getGuard())->id();
-        
-        return 123;
-        
+        return auth($this->cartInstance->getGuard())->id();
+    }
+    
+    /**
+     * User is Authorized?
+     *
+     * @return bool
+     */
+    private function isAuthorized(): bool
+    {
+        return $this->getIdentifier() !== null;
     }
     
     /**
@@ -401,7 +412,7 @@ class CartRepository implements CartRepositoryInterface
     {
         $cartItem = new CartItem($buyable, $options);
         
-        $cartItem->setAuthorized($this->getIdentifier() !== null);
+        $cartItem->setAuthorized($this->isAuthorized());
         
         $qty += optional($this->getItems()->get($cartItem->rowId))->qty;
         $cartItem->setQty($qty);

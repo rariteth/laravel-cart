@@ -9,6 +9,7 @@ use Illuminate\Session\SessionManager;
 use Illuminate\Support\ServiceProvider;
 use Rariteth\LaravelCart\Contracts\CartInstanceInterface;
 use Rariteth\LaravelCart\Contracts\Repositories\CartRepositoryInterface;
+use Rariteth\LaravelCart\Entities\CartInstance;
 use Rariteth\LaravelCart\Repositories\CartRepository;
 
 class CartServiceProvider extends ServiceProvider

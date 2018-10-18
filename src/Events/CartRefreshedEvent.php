@@ -6,17 +6,11 @@ namespace Rariteth\LaravelCart\Events;
 
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Foundation\Events\Dispatchable;
-use Rariteth\LaravelCart\Entities\CartItem;
 use Rariteth\LaravelCart\Contracts\CartInstanceInterface;
 
-class CartRemovedItemEvent
+class CartRefreshedEvent
 {
     use Dispatchable, SerializesModels;
-    
-    /**
-     * @var CartItem
-     */
-    private $cartItem;
     
     /**
      * @var CartInstanceInterface
@@ -26,12 +20,10 @@ class CartRemovedItemEvent
     /**
      * Create a new event instance.
      *
-     * @param CartItem              $cartItem
      * @param CartInstanceInterface $cartInstance
      */
-    public function __construct(CartItem $cartItem, CartInstanceInterface $cartInstance)
+    public function __construct(CartInstanceInterface $cartInstance)
     {
-        $this->cartItem     = $cartItem;
         $this->cartInstance = $cartInstance;
     }
 }

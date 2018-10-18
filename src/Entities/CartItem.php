@@ -1,10 +1,11 @@
 <?php
 
-namespace Rariteth\LaravelCart;
+namespace Rariteth\LaravelCart\Entities;
 
+use Assert\Assertion;
+use Assert\InvalidArgumentException;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Carbon;
-use InvalidArgumentException;
 use Rariteth\LaravelCart\Contracts\BuyableInterface;
 use Illuminate\Contracts\Support\Jsonable;
 
@@ -17,7 +18,7 @@ use Illuminate\Contracts\Support\Jsonable;
  * @property string           $name
  * @property float            $price
  * @property CartItemOptions  $options
- * @property Carbon           $expireAt
+ * @property Carbon           $addedAt
  * @property BuyableInterface $buyable
  * @property bool             $authorized
  *
@@ -68,11 +69,11 @@ class CartItem implements Arrayable, Jsonable
     private $options;
     
     /**
-     * Refresh item associate model after expiring
+     * Added timestamp of item
      *
      * @var Carbon
      */
-    private $expireAt;
+    private $addedAt;
     
     /**
      * Buyable class name
@@ -81,7 +82,11 @@ class CartItem implements Arrayable, Jsonable
      */
     private $buyableClass;
     
-    /** @var bool */
+    /**
+     * Add item as authorized user or not
+     *
+     * @var bool
+     */
     private $authorized = false;
     
     private $attributes
@@ -92,7 +97,7 @@ class CartItem implements Arrayable, Jsonable
             'name',
             'price',
             'options',
-            'expireAt',
+            'addedAt',
             'authorized',
         ];
     
@@ -101,30 +106,24 @@ class CartItem implements Arrayable, Jsonable
      *
      * @param BuyableInterface $buyable
      * @param CartItemOptions  $options
+     *
+     * @throws InvalidArgumentException
      */
     public function __construct(BuyableInterface $buyable, CartItemOptions $options)
     {
         $allowZeroPrice = config('cart.allow_zero_price', false);
         
-        $identifier   = $buyable->getBuyableIdentifier($options);
-        $name         = $buyable->getBuyableName($options);
-        $price        = $buyable->getBuyablePrice($options);
-        $itemExpireAt = $buyable->getBuyableExpireAt($options);
+        $identifier = $buyable->getBuyableIdentifier($options);
+        $name       = $buyable->getBuyableName($options);
+        $price      = $buyable->getBuyablePrice($options);
         
-        if ( ! \is_bool($allowZeroPrice)) {
-            throw new InvalidArgumentException('Config param `allow_zero_price` should be boolean');
-        }
+        Assertion::boolean($allowZeroPrice);
+        Assertion::greaterThan($identifier, 0);
+        Assertion::notBlank($name);
+        Assertion::greaterOrEqualThan($price, 0.0);
         
-        if ($identifier < 1) {
-            throw new InvalidArgumentException('Please supply a valid identifier.');
-        }
-        
-        if (empty($name)) {
-            throw new InvalidArgumentException('Please supply a valid name.');
-        }
-        
-        if ($price === 0.0 && ! $allowZeroPrice) {
-            throw new InvalidArgumentException('Please supply a valid price.');
+        if ( ! $allowZeroPrice) {
+            Assertion::greaterThan($price, 0.0);
         }
         
         $this->identifier   = $identifier;
@@ -132,7 +131,7 @@ class CartItem implements Arrayable, Jsonable
         $this->price        = $price;
         $this->rowId        = $this->generateRowId($identifier, $options);
         $this->options      = $options;
-        $this->expireAt     = $itemExpireAt;
+        $this->addedAt      = now();
         $this->buyableClass = \get_class($buyable);
     }
     
@@ -170,13 +169,15 @@ class CartItem implements Arrayable, Jsonable
      *
      * @param BuyableInterface $buyable
      *
-     * @return void
+     * @return self
      */
-    public function updateFromBuyable(BuyableInterface $buyable): void
+    public function update(BuyableInterface $buyable): self
     {
         $this->identifier = $buyable->getBuyableIdentifier($this->options);
         $this->name       = $buyable->getBuyableName($this->options);
         $this->price      = $buyable->getBuyablePrice($this->options);
+        
+        return $this;
     }
     
     /**
@@ -185,6 +186,8 @@ class CartItem implements Arrayable, Jsonable
      * @param string $attribute
      *
      * @return mixed
+     *
+     * @throws InvalidArgumentException
      */
     public function __get(string $attribute)
     {
@@ -193,12 +196,9 @@ class CartItem implements Arrayable, Jsonable
             return \call_user_func([$this->buyableClass, 'findOrFail'], $this->identifier);
         }
         
-        if (\in_array($attribute, $this->attributes, true) && property_exists($this, $attribute)) {
-            
-            return $this->{$attribute};
-        }
+        Assertion::inArray($attribute, $this->attributes);
         
-        throw new InvalidArgumentException(sprintf('Attribute `%s` is not exists!', $attribute));
+        return $this->{$attribute};
     }
     
     /**
@@ -209,14 +209,14 @@ class CartItem implements Arrayable, Jsonable
     public function toArray(): array
     {
         return [
-            'rowId'    => $this->rowId,
-            'id'       => $this->identifier,
-            'name'     => $this->name,
-            'qty'      => $this->qty,
-            'price'    => $this->price,
-            'options'  => $this->options->toArray(),
-            'total'    => $this->getTotal(),
-            'expireAt' => $this->expireAt->format(Carbon::DEFAULT_TO_STRING_FORMAT),
+            'rowId'   => $this->rowId,
+            'id'      => $this->identifier,
+            'name'    => $this->name,
+            'qty'     => $this->qty,
+            'price'   => $this->price,
+            'options' => $this->options->toArray(),
+            'total'   => $this->getTotal(),
+            'addedAt' => $this->addedAt->format(Carbon::DEFAULT_TO_STRING_FORMAT),
         ];
     }
     
