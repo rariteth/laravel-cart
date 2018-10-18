@@ -19,7 +19,7 @@ return [
         
         'connection' => null,
         
-        'table' => 'shoppingcart',
+        'table' => 'laravel-cart',
     
     ],
     
