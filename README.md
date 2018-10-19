@@ -1,4 +1,10 @@
 
+[![Build Status](https://travis-ci.org/rariteth/laravel-cart.svg?branch=master)](https://travis-ci.org/rariteth/laravel-cart)
+[![Latest Stable Version](https://poser.pugx.org/rariteth/laravel-cart/v/stable)](https://packagist.org/packages/rariteth/laravel-cart)
+[![Total Downloads](https://poser.pugx.org/rariteth/laravel-cart/downloads)](https://packagist.org/packages/rariteth/laravel-cart)
+[![License](https://poser.pugx.org/rariteth/laravel-cart/license)](https://packagist.org/packages/rariteth/laravel-cart)
+
+
 ## Installation
 
 Install the package through [Composer](http://getcomposer.org/).
