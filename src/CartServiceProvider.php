@@ -25,7 +25,12 @@ class CartServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/../config/cart.php', 'cart');
         
         $this->app->bind(CartRepositoryInterface::class, CartRepository::class);
-        $this->app->bind(CartInstanceInterface::class, CartInstance::class);
+        $this->app->bind(CartInstanceInterface::class, function () {
+            $defaultInstance = (string)config('cart.default_cart_instance');
+            $defaultGuard    = (string)config('cart.default_auth_guard');
+            
+            return new CartInstance($defaultInstance, $defaultGuard);
+        });
         
         //$this->setupEvents();
         
@@ -35,8 +40,8 @@ class CartServiceProvider extends ServiceProvider
             $this->publishes([__DIR__ . '/../config/cart.php' => config_path('cart.php')], 'laravel-cart-config');
             
             // Migration publish
-            $stubMigrationFile = sprintf('%s/../database/migrations/0000_00_00_000000_create_shoppingcart_table.php', __DIR__);
-            $copyMigrationFile = database_path(sprintf('migrations/%s_create_shoppingcart_table.php', date('Y_m_d_His')));
+            $stubMigrationFile = sprintf('%s/../database/migrations/0000_00_00_000000_create_cart_table.php', __DIR__);
+            $copyMigrationFile = database_path(sprintf('migrations/%s_create_cart_table.php', date('Y_m_d_His')));
             
             $this->publishes([$stubMigrationFile => $copyMigrationFile], 'migrations');
         }

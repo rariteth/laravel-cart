@@ -4,7 +4,7 @@ namespace Rariteth\LaravelCart\Tests;
 
 use Illuminate\Foundation\Testing\WithFaker;
 use Orchestra\Testbench\TestCase;
-use Rariteth\LaravelCart\CartInstance;
+use Rariteth\LaravelCart\Entities\CartInstance;
 
 class CartInstanceTest extends TestCase
 {
@@ -17,7 +17,9 @@ class CartInstanceTest extends TestCase
      */
     public function cannot_empty_instance_name()
     {
-        new CartInstance('');
+        $guardName = $this->faker()->name;
+        
+        new CartInstance('', $guardName);
     }
     
     /**
@@ -27,7 +29,9 @@ class CartInstanceTest extends TestCase
      */
     public function cannot_empty_guard_name()
     {
-        new CartInstance('test', '');
+        $instanceName = $this->faker()->name;
+        
+        new CartInstance($instanceName, '');
     }
     
     /**
@@ -37,8 +41,9 @@ class CartInstanceTest extends TestCase
     public function correctry_getting_instance_name()
     {
         $instanceName = $this->faker()->name;
+        $guardName    = $this->faker()->name;
         
-        $cart = new CartInstance($instanceName);
+        $cart = new CartInstance($instanceName, $guardName);
         
         $this->assertEquals($instanceName, $cart->getInstance());
     }

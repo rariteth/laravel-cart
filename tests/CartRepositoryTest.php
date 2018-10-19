@@ -4,11 +4,9 @@ namespace Rariteth\LaravelCart\Tests;
 
 use Illuminate\Support\Facades\Event;
 use Orchestra\Testbench\TestCase;
-use Rariteth\LaravelCart\Entities\CartInstance;
 use Rariteth\LaravelCart\CartServiceProvider;
 use Rariteth\LaravelCart\Contracts\Repositories\CartRepositoryInterface;
 use Rariteth\LaravelCart\Events\CartAddedItemEvent;
-use Rariteth\LaravelCart\Repositories\CartRepository;
 use Rariteth\LaravelCart\Tests\Fixtures\BuyableProduct;
 
 class CartRepositoryTest extends TestCase

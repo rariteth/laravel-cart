@@ -10,9 +10,6 @@ use Rariteth\LaravelCart\Contracts\CartInstanceInterface;
 
 class CartInstance implements CartInstanceInterface
 {
-    public const DEFAULT_INSTANCE = 'default';
-    public const DEFAULT_GUARD    = 'web';
-    
     /**
      * Holds the current cart instance
      *
@@ -33,7 +30,7 @@ class CartInstance implements CartInstanceInterface
      *
      * @throws AssertionFailedException
      */
-    public function __construct(string $instance = self::DEFAULT_INSTANCE, string $guard = self::DEFAULT_GUARD)
+    public function __construct(string $instance, string $guard)
     {
         Assertion::notBlank($instance);
         Assertion::notBlank($guard);

@@ -5,9 +5,8 @@ namespace Rariteth\LaravelCart\Tests;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Orchestra\Testbench\TestCase;
-use Rariteth\LaravelCart\CartItem;
-use Rariteth\LaravelCart\CartItemOptions;
-use Rariteth\LaravelCart\Contracts\BuyableInterface;
+use Rariteth\LaravelCart\Entities\CartItem;
+use Rariteth\LaravelCart\Entities\CartItemOptions;
 use Rariteth\LaravelCart\Tests\Fixtures\BuyableProduct;
 
 class CartItemTest extends TestCase
@@ -192,7 +191,7 @@ class CartItemTest extends TestCase
         $options  = new CartItemOptions(['size' => 'XL', 'color' => 'red']);
         $cartItem = new CartItem($product, $options);
         
-        $this->assertEquals($cartItem->rowId, '10a24ff3d07678a6c057bcdcbae7517b');
+        $this->assertEquals($cartItem->rowId, 'aa07fd2f5a2d162044eff5259a122044');
     }
     
     /** @test */

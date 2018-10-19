@@ -3,7 +3,8 @@
 return [
     
     'store_in_database' => true,
-    'auth_guard'        => 'web',
+    'default_auth_guard'    => 'web',
+    'default_cart_instance' => 'default',
     'allow_zero_price'  => false,
     /*
     |--------------------------------------------------------------------------

@@ -16,7 +16,7 @@ To save cart into the database so you can retrieve it later, the package needs t
 By default the package will use the default database connection and use a table named `laravel-cart`.
 If you want to change these options, you'll have to publish the `config` file.
 
-    php artisan vendor:publish --provider="Rariteth\LaravelCart\CartServiceProvider" --tag="config"
+    php artisan vendor:publish --provider="Rariteth\LaravelCart\CartServiceProvider" --tag="laravel-cart-config"
 
 This will give you a `cart.php` config file in which you can make the changes.
 
