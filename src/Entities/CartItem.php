@@ -99,6 +99,7 @@ class CartItem implements Arrayable, Jsonable
             'options',
             'addedAt',
             'authorized',
+            'buyable',
         ];
     
     /**
@@ -199,6 +200,16 @@ class CartItem implements Arrayable, Jsonable
         Assertion::inArray($attribute, $this->attributes);
         
         return $this->{$attribute};
+    }
+    
+    /**
+     * @param $attribute
+     *
+     * @return bool
+     */
+    public function __isset($attribute)
+    {
+        return \in_array($attribute, $this->attributes, true);
     }
     
     /**

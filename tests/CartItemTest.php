@@ -114,7 +114,7 @@ class CartItemTest extends TestCase
      * @test
      * @expectedException \Assert\AssertionFailedException
      * @expectedExceptionMessage Value "qweqweqwe" is not an element of the valid values: identifier, rowId, qty, name, price, options,
-     *                           addedAt, authorized
+     *                           addedAt, authorized, buyable
      */
     public function correctrly_getters()
     {
