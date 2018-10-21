@@ -4,6 +4,14 @@
 [![Total Downloads](https://poser.pugx.org/rariteth/laravel-cart/downloads)](https://packagist.org/packages/rariteth/laravel-cart)
 [![License](https://poser.pugx.org/rariteth/laravel-cart/license)](https://packagist.org/packages/rariteth/laravel-cart)
 
+* [Usage](#usage)
+* [Collections](#collections)
+* [Instances](#instances)
+* [Models](#models)
+* [Database](#database)
+* [Exceptions](#exceptions)
+* [Events](#events)
+* [Example](#example)
 
 ## Installation
 
@@ -31,3 +39,11 @@ To make your life easy, the package also includes a ready to use `migration` whi
     php artisan vendor:publish --provider="Rariteth\LaravelCart\CartServiceProvider" --tag="migrations"
 
 This will place a `laravel-cart` table's migration file into `database/migrations` directory. Now all you have to do is run `php artisan migrate` to migrate your database.
+
+
+$this->app
+            ->when(CartController::class)
+            ->needs(CartInstanceInterface::class)
+            ->give(function () {
+                return new CartInstance('test', 'web');
+            });

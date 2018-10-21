@@ -2,10 +2,11 @@
 
 return [
     
-    'store_in_database' => true,
+    'store_in_database'     => true,
     'default_auth_guard'    => 'web',
     'default_cart_instance' => 'default',
-    'allow_zero_price'  => false,
+    'allow_zero_price'      => false,
+    'session_root_key'      => 'cart-bags',
     /*
     |--------------------------------------------------------------------------
     | Shoppingcart database settings

@@ -380,7 +380,7 @@ class CartRepository implements CartRepositoryInterface
      */
     private function sessionInstanceName(): string
     {
-        return sprintf('cart-bags.%s', $this->cartInstance->getInstance());
+        return sprintf('%s.%s', config('cart.session_root_key'), $this->cartInstance->getInstance());
     }
     
     /**
