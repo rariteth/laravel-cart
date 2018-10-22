@@ -80,6 +80,11 @@ interface CartRepositoryInterface
     public function remove(CartItem $cartItem): void;
     
     /**
+     * @param Collection $items
+     */
+    public function removeBatch(Collection $items): void;
+    
+    /**
      * @param CartItem $cartItem
      */
     public function update(CartItem $cartItem): void;

@@ -16,6 +16,7 @@ use Illuminate\Support\Collection;
 use Rariteth\LaravelCart\Events\CartAddedItemEvent;
 use Rariteth\LaravelCart\Events\CartClearedEvent;
 use Rariteth\LaravelCart\Events\CartRefreshedEvent;
+use Rariteth\LaravelCart\Events\CartRemovedBatchItemsEvent;
 use Rariteth\LaravelCart\Events\CartRemovedItemEvent;
 use Rariteth\LaravelCart\Events\CartUpdatedItemEvent;
 
@@ -128,6 +129,18 @@ class CartRepository implements CartRepositoryInterface
         $this->storeItems();
         
         event(new CartRemovedItemEvent($cartItem, $this->cartInstance));
+    }
+    
+    /**
+     * @inheritdoc
+     */
+    public function removeBatch(Collection $items): void
+    {
+        $this->items = $this->getItems()->forget($items->pluck('rowId'));
+        
+        $this->storeItems();
+        
+        event(new CartRemovedBatchItemsEvent($items, $this->cartInstance));
     }
     
     /**
