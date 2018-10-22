@@ -12,7 +12,7 @@ use Rariteth\LaravelCart\Tests\Fixtures\BuyableProduct;
 class CartItemTest extends TestCase
 {
     use WithFaker;
-
+    
     /** @test */
     public function creating_correctrly()
     {
@@ -205,17 +205,18 @@ class CartItemTest extends TestCase
         
         $this->assertEquals(
             [
-                'rowId'   => $cartItem->rowId,
-                'id'      => $product->getBuyableIdentifier($options),
-                'name'    => $product->getBuyableName($options),
-                'price'   => 10.00,
-                'qty'     => $cartItem->qty,
-                'options' => [
+                'rowId'     => $cartItem->rowId,
+                'id'        => $product->getBuyableIdentifier($options),
+                'name'      => $product->getBuyableName($options),
+                'price'     => 10.00,
+                'qty'       => $cartItem->qty,
+                'options'   => [
                     'size'  => $options->size,
                     'color' => $options->color,
                 ],
-                'total'   => $cartItem->getTotal(),
-                'addedAt' => $cartItem->addedAt->format(Carbon::DEFAULT_TO_STRING_FORMAT),
+                'total'     => $cartItem->getTotal(),
+                'addedAt'   => $cartItem->addedAt->format(Carbon::DEFAULT_TO_STRING_FORMAT),
+                'updatedAt' => $cartItem->updatedAt->format(Carbon::DEFAULT_TO_STRING_FORMAT),
             ], $cartItem->toArray()
         );
     }
@@ -231,17 +232,18 @@ class CartItemTest extends TestCase
         
         $json = json_encode(
             [
-                'rowId'   => $cartItem->rowId,
-                'id'      => $product->getBuyableIdentifier($options),
-                'name'    => $product->getBuyableName($options),
-                'qty'     => $cartItem->qty,
-                'price'   => 10.00,
-                'options' => [
+                'rowId'     => $cartItem->rowId,
+                'id'        => $product->getBuyableIdentifier($options),
+                'name'      => $product->getBuyableName($options),
+                'qty'       => $cartItem->qty,
+                'price'     => 10.00,
+                'options'   => [
                     'size'  => $options->size,
                     'color' => $options->color,
                 ],
-                'total'   => $cartItem->getTotal(),
-                'addedAt' => $cartItem->addedAt->format(Carbon::DEFAULT_TO_STRING_FORMAT),
+                'total'     => $cartItem->getTotal(),
+                'addedAt'   => $cartItem->addedAt->format(Carbon::DEFAULT_TO_STRING_FORMAT),
+                'updatedAt' => $cartItem->updatedAt->format(Carbon::DEFAULT_TO_STRING_FORMAT),
             ]
         );
         
