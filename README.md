@@ -45,26 +45,37 @@ For using many instances like 'wishlist', 'some-other-items' and etc... Inject i
 
 ```php
 
-    // Instance 'whishlist' with guard 'web'
-    $this->app
-         ->when(
-            [
-                Whishlist\ManageController::class,
-                Whishlist\CheckoutController::class
-            ]
-         )
-         ->needs(CartRepositoryInterface::class)
-            ->give(function () {
-                return new CartRepository(new CartInstance('whishlist', 'web'));
-            });
+class AppServiceProvider extends ServiceProvider
+{
+    /**
+     * Bootstrap any application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        // Instance 'whishlist' with guard 'web'
+        $this->app
+             ->when(
+                [
+                    Whishlist\ManageController::class,
+                    Whishlist\CheckoutController::class
+                ]
+             )
+             ->needs(CartRepositoryInterface::class)
+                ->give(function () {
+                    return new CartRepository(new CartInstance('whishlist', 'web'));
+                });
 
-    // Instance 'other-cart' with guard 'frontend'
-    $this->app
-         ->when(OtherCartController::class)
-         ->needs(CartInstanceInterface::class)
-         ->give(function () {
-            return new CartInstance('other-cart', 'frontend');
-         });
+        // Instance 'other-cart' with guard 'frontend'
+        $this->app
+             ->when(OtherCartController::class)
+             ->needs(CartInstanceInterface::class)
+             ->give(function () {
+                return new CartInstance('other-cart', 'frontend');
+             });
+             
+...
 
 ```
 
@@ -77,7 +88,6 @@ All products most implements BuyableInterface
 
 ```php
 
-    // Add
     class CartController extends Controller
     {
         /**
@@ -112,7 +122,8 @@ All products most implements BuyableInterface
          */
         public function add(Product $product)
         {
-            $this->cartRepository->add($product);
+            $qty = 1;
+            $this->cartRepository->add($product, $qty);
 
             return redirect()->route('cart.index');
         }
@@ -160,6 +171,60 @@ All products most implements BuyableInterface
            }
 
            return abort(404);
+        }
+        
+        /**
+         * @param CartRepositoryInterface $cartRepository
+         */
+        public function refreshCartItems(CartRepositoryInterface $cartRepository): void
+        {
+            $shouldRefreshItems = $cartRepository->search(function (CartItem $cartItem) {
+                return $this->shouldRefreshCartItem($cartItem);
+            });
+
+            $cartRepository->refresh($shouldRefreshItems);
+        }
+        
+        /**
+         * @param CartRepositoryInterface $cartRepository
+         */
+        public function refreshCartItems(CartRepositoryInterface $cartRepository): void
+        {
+            $shouldRefreshItems   = $cartRepository->getGuestItems();
+
+            $cartRepository->refresh($shouldRefreshItems);
+        }
+        
+        /**
+         * @param CartRepositoryInterface $cartRepository
+         */
+        public function removeOldCartItems(CartRepositoryInterface $cartRepository): void
+        {
+            $itemsForRemove = $cartRepository->search(function (CartItem $cartItem) {
+                return $this->shouldRemoveCartItem($cartItem);
+            });
+
+            $cartRepository->removeBatch($itemsForRemove);
+        }
+        
+        /**
+         * @param CartItem $cartItem
+         *
+         * @return bool
+         */
+        private function shouldRefreshCartItem(CartItem $cartItem): bool
+        {
+            return $cartItem->updatedAt < $this->expireAt()->subDay();
+        }
+
+        /**
+         * @param CartItem $cartItem
+         *
+         * @return bool
+         */
+        private function shouldRemoveCartItem(CartItem $cartItem): bool
+        {
+            return $cartItem->addedAt < now()->subDays(5);
         }
     }
 
