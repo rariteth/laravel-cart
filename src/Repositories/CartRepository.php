@@ -82,19 +82,24 @@ class CartRepository implements CartRepositoryInterface
         return $this->getItems()->filter($search);
     }
     
+    /**
+     * @param Collection $items
+     */
     public function refresh(Collection $items): void
     {
-        $refreshItems = $items->map(function (CartItem $cartItem) {
-            $cartItem->setAuthorized($this->isAuthorized());
+        if ($items->isNotEmpty()) {
+            $refreshItems = $items->map(function (CartItem $cartItem) {
+                $cartItem->setAuthorized($this->isAuthorized());
+                
+                return $cartItem->update($cartItem->buyable);
+            });
             
-            return $cartItem->update($cartItem->buyable);
-        });
-        
-        $this->items = $this->getItems()->merge($refreshItems);
-        
-        $this->storeItems();
-        
-        event(new CartRefreshedEvent($this->cartInstance));
+            $this->items = $this->getItems()->merge($refreshItems);
+            
+            $this->storeItems();
+            
+            event(new CartRefreshedEvent($this->cartInstance));
+        }
     }
     
     /**
