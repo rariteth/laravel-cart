@@ -19,6 +19,7 @@ use Illuminate\Contracts\Support\Jsonable;
  * @property float            $price
  * @property CartItemOptions  $options
  * @property Carbon           $addedAt
+ * @property Carbon           $updatedAt
  * @property BuyableInterface $buyable
  * @property bool             $authorized
  *
@@ -76,6 +77,13 @@ class CartItem implements Arrayable, Jsonable
     private $addedAt;
     
     /**
+     * Added timestamp of item
+     *
+     * @var Carbon
+     */
+    private $updatedAt;
+    
+    /**
      * Buyable class name
      *
      * @var string
@@ -98,6 +106,7 @@ class CartItem implements Arrayable, Jsonable
             'price',
             'options',
             'addedAt',
+            'updatedAt',
             'authorized',
             'buyable',
         ];
@@ -133,6 +142,7 @@ class CartItem implements Arrayable, Jsonable
         $this->rowId        = $this->generateRowId($identifier, $options);
         $this->options      = $options;
         $this->addedAt      = now();
+        $this->updatedAt    = now();
         $this->buyableClass = \get_class($buyable);
     }
     
@@ -177,6 +187,7 @@ class CartItem implements Arrayable, Jsonable
         $this->identifier = $buyable->getBuyableIdentifier($this->options);
         $this->name       = $buyable->getBuyableName($this->options);
         $this->price      = $buyable->getBuyablePrice($this->options);
+        $this->updatedAt  = now();
         
         return $this;
     }
@@ -220,14 +231,15 @@ class CartItem implements Arrayable, Jsonable
     public function toArray(): array
     {
         return [
-            'rowId'   => $this->rowId,
-            'id'      => $this->identifier,
-            'name'    => $this->name,
-            'qty'     => $this->qty,
-            'price'   => $this->price,
-            'options' => $this->options->toArray(),
-            'total'   => $this->getTotal(),
-            'addedAt' => $this->addedAt->format(Carbon::DEFAULT_TO_STRING_FORMAT),
+            'rowId'     => $this->rowId,
+            'id'        => $this->identifier,
+            'name'      => $this->name,
+            'qty'       => $this->qty,
+            'price'     => $this->price,
+            'options'   => $this->options->toArray(),
+            'total'     => $this->getTotal(),
+            'addedAt'   => $this->addedAt->format(Carbon::DEFAULT_TO_STRING_FORMAT),
+            'updatedAt' => $this->updatedAt->format(Carbon::DEFAULT_TO_STRING_FORMAT),
         ];
     }
     
