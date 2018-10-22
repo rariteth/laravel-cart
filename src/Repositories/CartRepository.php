@@ -136,11 +136,13 @@ class CartRepository implements CartRepositoryInterface
      */
     public function removeBatch(Collection $items): void
     {
-        $this->items = $this->getItems()->forget($items->pluck('rowId'));
-        
-        $this->storeItems();
-        
-        event(new CartRemovedBatchItemsEvent($items, $this->cartInstance));
+        if ($items->isNotEmpty()) {
+            $this->items = $this->getItems()->forget($items->pluck('rowId'));
+            
+            $this->storeItems();
+            
+            event(new CartRemovedBatchItemsEvent($items, $this->cartInstance));
+        }
     }
     
     /**
