@@ -99,7 +99,7 @@ class CartRepository implements CartRepositoryInterface
             
             $this->storeItems();
             
-            event(new CartRefreshedEvent($this->cartInstance));
+            event(new CartRefreshedEvent($refreshItems, $this->cartInstance));
         }
     }
     
@@ -168,7 +168,14 @@ class CartRepository implements CartRepositoryInterface
     public function getItems(): Collection
     {
         if ( ! $this->items) {
-            $this->items = $this->getSessionItems()->merge($this->getDatabaseItems());
+            $items      = $this->getSessionItems();
+            $identifier = $this->getIdentifier();
+            
+            if ($identifier && $this->shouldStoreInDatabase) {
+                $items = $items->merge($this->getDatabaseItems($identifier));
+            }
+            
+            $this->items = $items;
         }
         
         return $this->items;
@@ -203,8 +210,11 @@ class CartRepository implements CartRepositoryInterface
         $this->storeInSession();
         
         // Database store
-        $this->storeInDatabase();
+        $identifier = $this->getIdentifier();
         
+        if ($this->shouldStoreInDatabase && $identifier) {
+            $this->storeInDatabase($identifier, $this->getItems());
+        }
     }
     
     /**
@@ -247,7 +257,7 @@ class CartRepository implements CartRepositoryInterface
     /**
      * @inheritdoc
      */
-    public function hasItem(CartInstanceInterface $cart, CartItem $cartItem): bool
+    public function hasItem(CartItem $cartItem): bool
     {
         return $this->getItems()->pluck('rowId')->contains($cartItem->rowId);
     }
@@ -255,7 +265,7 @@ class CartRepository implements CartRepositoryInterface
     /**
      * @inheritdoc
      */
-    public function storedItemsByIdentifier(int $identifier): Collection
+    public function getDatabaseItems(int $identifier): Collection
     {
         $storedCart = $this->getConnection()
                            ->table($this->getTableName())
@@ -273,6 +283,31 @@ class CartRepository implements CartRepositoryInterface
     }
     
     /**
+     * Store in database storage
+     *
+     * @param int        $identifier
+     * @param Collection $items
+     *
+     * @return bool
+     */
+    public function storeInDatabase(int $identifier, Collection $items): bool
+    {
+        return $this->getConnection()
+                    ->table($this->getTableName())
+                    ->updateOrInsert(
+                        [
+                            'identifier' => $identifier,
+                            'instance'   => $this->cartInstance->getInstance(),
+                            'guard'      => $this->cartInstance->getGuard(),
+                        ],
+                        [
+                            'content'    => serialize($items),
+                            'updated_at' => now(),
+                        ]
+                    );
+    }
+    
+    /**
      * @return Collection
      */
     private function getSessionItems(): Collection
@@ -286,58 +321,6 @@ class CartRepository implements CartRepositoryInterface
     private function destroySessionItems(): void
     {
         session()->forget($this->sessionInstanceName());
-    }
-    
-    /**
-     * Restore the cart with the given identifier.
-     *
-     * @return Collection
-     */
-    private function getDatabaseItems(): Collection
-    {
-        $items      = collect();
-        $identifier = $this->getIdentifier();
-        
-        if ($identifier && $this->shouldStoreInDatabase) {
-            $stored = $this->getConnection()
-                           ->table($this->getTableName())
-                           ->where('identifier', $identifier)
-                           ->where('instance', $this->cartInstance->getInstance())
-                           ->where('guard', $this->cartInstance->getGuard())
-                           ->first();
-            
-            if ($stored && $stored->content) {
-                $items = unserialize($stored->content, ['allowed_classes' => true]);
-            }
-        }
-        
-        return $items;
-    }
-    
-    /**
-     * Store in database storage
-     *
-     * @return void
-     */
-    private function storeInDatabase(): void
-    {
-        $identifier = $this->getIdentifier();
-        
-        if ($this->shouldStoreInDatabase && $identifier) {
-            $this->getConnection()
-                 ->table($this->getTableName())
-                 ->updateOrInsert(
-                     [
-                         'identifier' => $identifier,
-                         'instance'   => $this->cartInstance->getInstance(),
-                         'guard'      => $this->cartInstance->getGuard(),
-                     ],
-                     [
-                         'content'    => serialize($this->getItems()),
-                         'updated_at' => now(),
-                     ]
-                 );
-        }
     }
     
     /**

@@ -6,6 +6,7 @@ namespace Rariteth\LaravelCart\Events;
 
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Support\Collection;
 use Rariteth\LaravelCart\Contracts\CartInstanceInterface;
 
 class CartRefreshedEvent
@@ -18,12 +19,19 @@ class CartRefreshedEvent
     private $cartInstance;
     
     /**
+     * @var Collection
+     */
+    private $refreshItems;
+    
+    /**
      * Create a new event instance.
      *
+     * @param Collection            $refreshItems
      * @param CartInstanceInterface $cartInstance
      */
-    public function __construct(CartInstanceInterface $cartInstance)
+    public function __construct(Collection $refreshItems, CartInstanceInterface $cartInstance)
     {
         $this->cartInstance = $cartInstance;
+        $this->refreshItems = $refreshItems;
     }
 }

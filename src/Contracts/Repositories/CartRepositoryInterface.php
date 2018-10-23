@@ -53,7 +53,7 @@ interface CartRepositoryInterface
     /**
      * @inheritdoc
      */
-    public function hasItem(CartInstanceInterface $cart, CartItem $cartItem): bool;
+    public function hasItem(CartItem $cartItem): bool;
     
     /**
      * Clear the cart
@@ -94,7 +94,17 @@ interface CartRepositoryInterface
      *
      * @return Collection
      */
-    public function storedItemsByIdentifier(int $identifier): Collection;
+    public function getDatabaseItems(int $identifier): Collection;
+    
+    /**
+     * Store in database storage
+     *
+     * @param int        $identifier
+     * @param Collection $items
+     *
+     * @return bool
+     */
+    public function storeInDatabase(int $identifier, Collection $items): bool;
     
     /**
      * @param CartInstanceInterface $cartInstance
