@@ -92,11 +92,9 @@ interface CartRepositoryInterface
     /**
      * @param int                   $identifier
      *
-     * @param CartInstanceInterface $cartInstance
-     *
      * @return Collection
      */
-    public function storedItemsByIdentifier(int $identifier, CartInstanceInterface $cartInstance): Collection;
+    public function storedItemsByIdentifier(int $identifier): Collection;
     
     /**
      * @param CartInstanceInterface $cartInstance

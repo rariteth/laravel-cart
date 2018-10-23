@@ -255,13 +255,13 @@ class CartRepository implements CartRepositoryInterface
     /**
      * @inheritdoc
      */
-    public function storedItemsByIdentifier(int $identifier, CartInstanceInterface $cartInstance): Collection
+    public function storedItemsByIdentifier(int $identifier): Collection
     {
         $storedCart = $this->getConnection()
                            ->table($this->getTableName())
                            ->select('content')
-                           ->where('instance', $cartInstance->getInstance())
-                           ->where('guard', $cartInstance->getGuard())
+                           ->where('instance', $this->cartInstance->getInstance())
+                           ->where('guard', $this->cartInstance->getGuard())
                            ->where('identifier', $identifier)
                            ->first();
         
