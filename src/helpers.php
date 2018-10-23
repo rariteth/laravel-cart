@@ -13,8 +13,8 @@ if ( ! function_exists('cart_repository')) {
     {
         /** @var CartRepositoryInterface $cartRepository */
         $cartRepository = app()->make(CartRepositoryInterface::class);
-    
-        return $cartInstance ? $cartRepository : $cartRepository->instance($cartInstance);
+        
+        return $cartInstance ? $cartRepository->instance($cartInstance) : $cartRepository;
     }
 }
 
@@ -29,7 +29,7 @@ if ( ! function_exists('cart_number_format')) {
         $decimals          = config('cart.format.decimals', 2);
         $decimalPoint      = config('cart.format.decimal_point', '.');
         $thousandSeparator = config('cart.format.thousand_separator', ',');
-    
+        
         return number_format($value, $decimals, $decimalPoint, $thousandSeparator);
     }
 }
