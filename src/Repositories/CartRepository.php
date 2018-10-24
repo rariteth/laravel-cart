@@ -95,9 +95,7 @@ class CartRepository implements CartRepositoryInterface
                 return $cartItem->update($cartItem->buyable);
             });
             
-            $this->items = $this->getItems()->merge($refreshItems);
-            
-            $this->storeItems();
+            $this->storeItems($this->getItems()->merge($refreshItems));
             
             event(new CartRefreshedEvent($refreshItems, $this->cartInstance));
         }
@@ -108,11 +106,19 @@ class CartRepository implements CartRepositoryInterface
      */
     public function add(BuyableInterface $buyable, int $qty = 1, array $options = []): CartItem
     {
-        $cartItem = $this->makeCartItem($buyable, new CartItemOptions($options), $qty);
+        $items = $this->getItems();
         
-        $this->items = $this->getItems()->put($cartItem->rowId, $cartItem);
+        $cartItem = new CartItem($buyable, new CartItemOptions($options));
         
-        $this->storeItems();
+        $cartItem->setAuthorized($this->isAuthorized());
+        
+        if ($existItem = $items->get($cartItem->rowId)) {
+            $qty += $existItem->qty;
+        }
+        
+        $cartItem->setQty($qty);
+        
+        $this->storeItems($items->put($cartItem->rowId, $cartItem));
         
         event(new CartAddedItemEvent($cartItem, $this->cartInstance));
         
@@ -124,9 +130,7 @@ class CartRepository implements CartRepositoryInterface
      */
     public function remove(CartItem $cartItem): void
     {
-        $this->items = $this->getItems()->forget($cartItem->rowId);
-        
-        $this->storeItems();
+        $this->storeItems($this->getItems()->forget($cartItem->rowId));
         
         event(new CartRemovedItemEvent($cartItem, $this->cartInstance));
     }
@@ -137,9 +141,10 @@ class CartRepository implements CartRepositoryInterface
     public function removeBatch(Collection $items): void
     {
         if ($items->isNotEmpty()) {
-            $this->items = $this->getItems()->forget($items->pluck('rowId'));
             
-            $this->storeItems();
+            $rowIds = $items->pluck('rowId');
+            
+            $this->storeItems($this->getItems()->forget($rowIds));
             
             event(new CartRemovedBatchItemsEvent($items, $this->cartInstance));
         }
@@ -154,9 +159,7 @@ class CartRepository implements CartRepositoryInterface
             $this->remove($cartItem);
         } else {
             
-            $this->items = $this->getItems()->put($cartItem->rowId, $cartItem);
-            
-            $this->storeItems();
+            $this->storeItems($this->getItems()->put($cartItem->rowId, $cartItem));
             
             event(new CartUpdatedItemEvent($cartItem, $this->cartInstance));
         }
@@ -204,17 +207,19 @@ class CartRepository implements CartRepositoryInterface
     /**
      * @inheritdoc
      */
-    public function storeItems(): void
+    public function storeItems(Collection $items): void
     {
         // Session store
-        $this->storeInSession();
+        $this->storeInSession($items);
         
         // Database store
         $identifier = $this->getIdentifier();
         
         if ($this->shouldStoreInDatabase && $identifier) {
-            $this->storeInDatabase($identifier, $this->getItems());
+            $this->storeInDatabase($identifier, $items);
         }
+        
+        $this->items = $items;
     }
     
     /**
@@ -248,8 +253,16 @@ class CartRepository implements CartRepositoryInterface
      */
     public function clear(): void
     {
+        // Destroy session
         $this->destroySessionItems();
-        $this->destroyDatabaseItems();
+        
+        // Destroy database
+        $identifier = $this->getIdentifier();
+        
+        if ($identifier && $this->shouldStoreInDatabase) {
+            
+            $this->destroyDatabaseItems($identifier);
+        }
         
         event(new CartClearedEvent($this->cartInstance));
     }
@@ -326,26 +339,23 @@ class CartRepository implements CartRepositoryInterface
     /**
      * Store in session storage
      */
-    private function storeInSession(): void
+    private function storeInSession(Collection $items): void
     {
-        session()->put($this->sessionInstanceName(), $this->getItems());
+        session()->put($this->sessionInstanceName(), $items);
     }
     
-    private function destroyDatabaseItems(): void
+    /**
+     * @param int $identifier
+     */
+    private function destroyDatabaseItems(int $identifier): void
     {
-        $identifier = $this->getIdentifier();
-        
-        if ($identifier && $this->shouldStoreInDatabase) {
-            
-            $this->getConnection()
-                 ->table($this->getTableName())
-                 ->select('content')
-                 ->where('instance', $this->cartInstance->getInstance())
-                 ->where('guard', $this->cartInstance->getGuard())
-                 ->where('identifier', $identifier)
-                 ->delete();
-            
-        }
+        $this->getConnection()
+             ->table($this->getTableName())
+             ->select('content')
+             ->where('instance', $this->cartInstance->getInstance())
+             ->where('guard', $this->cartInstance->getGuard())
+             ->where('identifier', $identifier)
+             ->delete();
     }
     
     /**
@@ -403,24 +413,4 @@ class CartRepository implements CartRepositoryInterface
     {
         return $this->getIdentifier() !== null;
     }
-    
-    /**
-     * @param BuyableInterface $buyable
-     * @param CartItemOptions  $options
-     * @param int              $qty
-     *
-     * @return CartItem
-     */
-    private function makeCartItem(BuyableInterface $buyable, CartItemOptions $options, int $qty): CartItem
-    {
-        $cartItem = new CartItem($buyable, $options);
-        
-        $cartItem->setAuthorized($this->isAuthorized());
-        
-        $qty += optional($this->getItems()->get($cartItem->rowId))->qty;
-        $cartItem->setQty($qty);
-        
-        return $cartItem;
-    }
-    
 }

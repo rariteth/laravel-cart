@@ -62,8 +62,10 @@ interface CartRepositoryInterface
     
     /**
      * Store all items
+     *
+     * @param Collection $items
      */
-    public function storeItems(): void;
+    public function storeItems(Collection $items): void;
     
     /**
      * @param BuyableInterface $buyable
@@ -90,7 +92,7 @@ interface CartRepositoryInterface
     public function update(CartItem $cartItem): void;
     
     /**
-     * @param int                   $identifier
+     * @param int $identifier
      *
      * @return Collection
      */
