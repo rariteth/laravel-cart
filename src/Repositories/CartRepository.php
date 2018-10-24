@@ -142,7 +142,7 @@ class CartRepository implements CartRepositoryInterface
     {
         if ($items->isNotEmpty()) {
             
-            $rowIds = $items->pluck('rowId');
+            $rowIds = $items->pluck('rowId')->toArray();
             
             $this->storeItems($this->getItems()->forget($rowIds));
             
@@ -329,7 +329,7 @@ class CartRepository implements CartRepositoryInterface
     }
     
     /**
-     * Destroy cart items from session
+     * Destroy cart items from sessionba
      */
     private function destroySessionItems(): void
     {
