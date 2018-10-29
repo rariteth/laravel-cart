@@ -307,6 +307,7 @@ class CartRepository implements CartRepositoryInterface
                     ->where('guard', $this->cartInstance->getGuard())
                     ->whereIn('identifier', $identifiers)
                     ->get()
+                    ->keyBy('identifier')
                     ->map(function ($storedCart) {
                         return unserialize($storedCart->content, ['allowed_classes' => true]);
                     });
