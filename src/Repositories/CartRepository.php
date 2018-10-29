@@ -296,6 +296,23 @@ class CartRepository implements CartRepositoryInterface
     }
     
     /**
+     * @inheritdoc
+     */
+    public function getDatabaseItemsMany(array $identifiers): Collection
+    {
+        return $this->getConnection()
+                    ->table($this->getTableName())
+                    ->select('content')
+                    ->where('instance', $this->cartInstance->getInstance())
+                    ->where('guard', $this->cartInstance->getGuard())
+                    ->whereIn('identifier', $identifiers)
+                    ->get()
+                    ->map(function ($storedCart) {
+                        return unserialize($storedCart->content, ['allowed_classes' => true]);
+                    });
+    }
+    
+    /**
      * Store in database storage
      *
      * @param int        $identifier

@@ -99,6 +99,14 @@ interface CartRepositoryInterface
     public function getDatabaseItems(int $identifier): Collection;
     
     /**
+     * @param array $identifiers
+     *
+     * @return \Illuminate\Support\Collection
+     *
+     */
+    public function getDatabaseItemsMany(array $identifiers): Collection;
+    
+    /**
      * Store in database storage
      *
      * @param int        $identifier
