@@ -302,7 +302,7 @@ class CartRepository implements CartRepositoryInterface
     {
         return $this->getConnection()
                     ->table($this->getTableName())
-                    ->select('content')
+                    ->select('content', 'identifier')
                     ->where('instance', $this->cartInstance->getInstance())
                     ->where('guard', $this->cartInstance->getGuard())
                     ->whereIn('identifier', $identifiers)
