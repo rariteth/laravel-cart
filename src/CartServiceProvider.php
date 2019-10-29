@@ -20,7 +20,7 @@ class CartServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register(): void
+    public function boot(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/cart.php', 'cart');
         
