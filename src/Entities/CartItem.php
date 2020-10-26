@@ -205,7 +205,7 @@ class CartItem implements Arrayable, Jsonable
     {
         if ($attribute === 'buyable') {
             
-            return \call_user_func([$this->buyableClass, 'findOrFail'], $this->identifier);
+            return \call_user_func([$this->buyableClass, 'find'], $this->identifier);
         }
         
         Assertion::inArray($attribute, $this->attributes);
